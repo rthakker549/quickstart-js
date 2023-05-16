@@ -24,6 +24,66 @@ limitations under the License.
 
   <link rel="stylesheet" href="main.css">
 </head>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-remote-config.js"></script>
+<script>
+ const firebaseConfig = {
+   // TODO: UPDATE WITH YOUR AUTHENTICATION
+   apiKey: "AIzaSyBD4TgaMhi3GQQ5OKCboQqe8ynDByL1KG0",
+    authDomain: "firenotes-8375f.firebaseapp.com",
+    projectId: "firenotes-8375f",
+    storageBucket: "firenotes-8375f.appspot.com",
+    messagingSenderId: "346430494314",
+    appId: "1:346430494314:web:865d55c27f77176f801c13",
+    measurementId: "G-QRYF3EL4K7"
+ };
+
+ firebase.initializeApp(firebaseConfig);
+ const remoteConfig = firebase.remoteConfig();
+
+ remoteConfig.settings = {
+   minimumFetchIntervalMillis: 1000,
+ };
+
+ remoteConfig.defaultConfig = ({
+   'welcome_message': 'Welcome',
+ });
+
+ remoteConfig.ensureInitialized()
+ .then(() => {
+   console.log('Firebase Remote Config is initialized');
+   showWelcomeMessage();
+ })
+ .catch((err) => {
+   console.error('Firebase Remote Config failed to initialize', err);
+ });
+
+ function showWelcomeMessage() {
+   // If you are only interested in the value then you can get it
+   // directly using one of the typed getters:
+   //
+   // const msg = remoteConfig.getString('welcome_message');
+
+   // To get the value and source of the parameter use `getValue`.
+   const val = remoteConfig.getValue('welcome_message');
+
+   const welcome_element = document.getElementById('welcome_message');
+   welcome_element.innerText = val._value + ' (' + val._source + ')';
+ }
+
+ function fetchConfig() {
+   const welcome_element = document.getElementById('welcome_message');
+   welcome_element.innerText = 'loading...';
+   remoteConfig.fetchAndActivate()
+     .then(() => {
+       showWelcomeMessage();
+     })
+     .catch((err) => {
+       console.error(err);
+     });
+ }
+</script>
 <body>
 <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
 
@@ -55,57 +115,5 @@ limitations under the License.
     </div>
   </main>
 </div>
-
-<!-- Import and configure the Firebase SDK -->
-<!-- These scripts are made available when the app is served or deployed on Firebase Hosting -->
-<!-- If you do not serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup -->
-<script src="/__/firebase/9.22.0/firebase-app-compat.js"></script>
-<script src="/__/firebase/9.22.0/firebase-remote-config.js"></script>
-<script src="/__/firebase/init.js"></script>
-<script>
-  const remoteConfig = firebase.remoteConfig();
-
-  remoteConfig.settings = {
-    minimumFetchIntervalMillis: 3600000,
-  };
-
-  remoteConfig.defaultConfig = ({
-    'welcome_message': 'Welcome',
-  });
-
-  remoteConfig.ensureInitialized()
-  .then(() => {
-    console.log('Firebase Remote Config is initialized');
-    showWelcomeMessage();
-  })
-  .catch((err) => {
-    console.error('Firebase Remote Config failed to initialize', err);
-  });
-
-  function showWelcomeMessage() {
-    // If you are only interested in the value then you can get it
-    // directly using one of the typed getters:
-    //
-    // const msg = remoteConfig.getString('welcome_message');
-
-    // To get the value and source of the parameter use `getValue`.
-    const val = remoteConfig.getValue('welcome_message');
-
-    const welcome_element = document.getElementById('welcome_message');
-    welcome_element.innerText = val._value + ' (' + val._source + ')';
-  }
-
-  function fetchConfig() {
-    const welcome_element = document.getElementById('welcome_message');
-    welcome_element.innerText = 'loading...';
-    remoteConfig.fetchAndActivate()
-      .then(() => {
-        showWelcomeMessage();
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
-</script>
 </body>
 </html>
